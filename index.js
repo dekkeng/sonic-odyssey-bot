@@ -1,5 +1,4 @@
 const fs = require('fs');
-const readlineSync = require('readline-sync');
 const colors = require('colors');
 
 const {
@@ -17,19 +16,7 @@ const { displayHeader } = require('./src/displayUtils');
 
 (async () => {
   displayHeader();
-  const method = readlineSync.question(
-    'Select input method (0 for seed phrase, 1 for private key): '
-  );
-
   let seedPhrasesOrKeys;
-  if (method === '0') {
-    seedPhrasesOrKeys = JSON.parse(fs.readFileSync('accounts.json', 'utf-8'));
-    if (!Array.isArray(seedPhrasesOrKeys) || seedPhrasesOrKeys.length === 0) {
-      throw new Error(
-        colors.red('accounts.json is not set correctly or is empty')
-      );
-    }
-  } else if (method === '1') {
     seedPhrasesOrKeys = JSON.parse(
       fs.readFileSync('privateKeys.json', 'utf-8')
     );
@@ -38,14 +25,9 @@ const { displayHeader } = require('./src/displayUtils');
         colors.red('privateKeys.json is not set correctly or is empty')
       );
     }
-  } else {
-    throw new Error(colors.red('Invalid input method selected'));
-  }
 
   const defaultAddressCount = 100;
-  const addressCountInput = readlineSync.question(
-    `How many random addresses do you want to generate? (default is ${defaultAddressCount}): `
-  );
+  const addressCountInput = 100
   const addressCount = addressCountInput
     ? parseInt(addressCountInput, 10)
     : defaultAddressCount;
@@ -77,9 +59,7 @@ const { displayHeader } = require('./src/displayUtils');
 
   let amountToSend;
   do {
-    const amountInput = readlineSync.question(
-      'Enter the amount of SOL to send (default is 0.001 SOL): '
-    );
+    const amountInput = 0.001
     amountToSend = amountInput ? parseFloat(amountInput) : 0.001;
 
     if (isNaN(amountToSend) || amountToSend < rentExemptionAmount) {
@@ -100,9 +80,7 @@ const { displayHeader } = require('./src/displayUtils');
   } while (isNaN(amountToSend) || amountToSend < rentExemptionAmount);
 
   const defaultDelay = 1000;
-  const delayInput = readlineSync.question(
-    `Enter the delay between transactions in milliseconds (default is ${defaultDelay}ms): `
-  );
+  const delayInput = defaultDelay
   const delayBetweenTx = delayInput ? parseInt(delayInput, 10) : defaultDelay;
 
   if (isNaN(delayBetweenTx) || delayBetweenTx < 0) {

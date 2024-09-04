@@ -7,7 +7,6 @@ const nacl = require('tweetnacl');
 const { connection, delay } = require('./src/solanaUtils');
 const { HEADERS } = require('./src/headers');
 const { displayHeader } = require('./src/displayUtils');
-const readlineSync = require('readline-sync');
 const moment = require('moment');
 
 const PRIVATE_KEYS = JSON.parse(fs.readFileSync('privateKeys.json', 'utf-8'));
@@ -139,23 +138,15 @@ async function processPrivateKey(privateKey) {
       console.log(`Available Box(es): ${availableBoxes}`.green);
       console.log('');
 
-      const method = readlineSync.question(
-        'Select input method (1 for claim box, 2 for open box, 3 for daily login): '
-      );
-
-      if (method === '1') {
         console.log(`[ ${moment().format('HH:mm:ss')} ] Please wait...`.yellow);
         await dailyClaim(token);
         console.log(
           `[ ${moment().format('HH:mm:ss')} ] All tasks completed!`.cyan
         );
-      } else if (method === '2') {
+
         let totalClaim;
         do {
-          totalClaim = readlineSync.question(
-            `How many boxes do you want to open? (Maximum is: ${availableBoxes}): `
-              .blue
-          );
+          totalClaim = availableBoxes
 
           if (totalClaim > availableBoxes) {
             console.log(`You cannot open more boxes than available`.red);
@@ -185,7 +176,7 @@ async function processPrivateKey(privateKey) {
             );
           }
         } while (totalClaim > availableBoxes);
-      } else if (method === '3') {
+        
         console.log(`[ ${moment().format('HH:mm:ss')} ] Please wait...`.yellow);
         const claimLogin = await dailyLogin(token, getKeypair(privateKey));
         if (claimLogin) {
@@ -200,9 +191,6 @@ async function processPrivateKey(privateKey) {
         console.log(
           `[ ${moment().format('HH:mm:ss')} ] All tasks completed!`.cyan
         );
-      } else {
-        throw new Error('Invalid input method selected'.red);
-      }
     } else {
       console.log(
         `There might be errors if you don't have sufficient balance or the RPC is down. Please ensure your balance is sufficient and your connection is stable`
@@ -360,12 +348,6 @@ async function dailyLogin(token, keypair, retries = 3) {
     for (let i = 0; i < PRIVATE_KEYS.length; i++) {
       const privateKey = PRIVATE_KEYS[i];
       await processPrivateKey(privateKey);
-      if (i < PRIVATE_KEYS.length - 1) {
-        const continueNext = readlineSync.keyInYNStrict(
-          `Do you want to process next private key?`
-        );
-        if (!continueNext) break;
-      }
     }
     console.log('All private keys processed.'.cyan);
   } catch (error) {
