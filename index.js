@@ -88,12 +88,7 @@ const { displayHeader } = require('./src/displayUtils');
   }
 
   for (const [index, seedOrKey] of seedPhrasesOrKeys.entries()) {
-    let fromKeypair;
-    if (method === '0') {
-      fromKeypair = await getKeypairFromSeed(seedOrKey);
-    } else {
-      fromKeypair = getKeypairFromPrivateKey(seedOrKey);
-    }
+    let fromKeypair = getKeypairFromPrivateKey(seedOrKey);
     console.log(
       colors.yellow(
         `Sending SOL from account ${
